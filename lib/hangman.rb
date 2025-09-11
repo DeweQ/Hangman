@@ -1,28 +1,31 @@
 require "colorize"
+require_relative "./constants"
 
 module Hangman
   # Contains state of hangman game
   class Hangman
-    @@PATH_TO_DICTIONARY_SOURCE = File.expand_path("../sources/10000_english_words.txt", __dir__)
-    @MAX_HEALTH = 6
     attr_reader :alphabet, :health
 
     def initialize(word)
-      @health = @MAX_HEALTH
+      @word = word.upcase
+      @health = Constants::MAX_HEALTH
       @alphabet = ("A".."Z").each_with_object({}) do |letter, result|
         result[letter] = false
       end
     end
 
     def update_alphabet(letter)
+      letter = letter.upcase
+      return unless alphabet.keys.include?(letter)
+
       @health -= 1 unless @word.include?(letter) || alphabet[letter]
-      alphabet[letter] = true 
+      alphabet[letter] = true
     end
-    
+
     def finished?
-      health <= 0 || @word.chars.all? {|ch| @alphabet[ch]}
+      @health <= 0 || @word.chars.all? { |ch| @alphabet[ch] }
     end
-    
+
     def word
       @word if finished?
     end
@@ -30,7 +33,7 @@ module Hangman
     def display_health
       str = ""
       health.times { str << "❤︎".colorize(:red) }
-      (@MAX_HEALTH - health).times { str << "❤︎".colorize(:white) }
+      (Constants::MAX_HEALTH - health).times { str << "❤︎".colorize(:white) }
       puts str
     end
 
@@ -61,19 +64,6 @@ module Hangman
       display_health
       display_word
       display_alphabet
-    end
-
-    def self.load_dictionary
-      f = File.open(@@PATH_TO_DICTIONARY_SOURCE)
-      dictionary = []
-      while (line = f.gets)
-        dictionary << line.chomp if line.chomp.size.between?(5, 12)
-      end
-      dictionary
-    end
-
-    def self.get_random_word
-      load_dictionary.sample
     end
   end
 end
