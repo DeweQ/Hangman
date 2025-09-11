@@ -6,12 +6,12 @@ module Hangman
   class Hangman
     attr_reader :alphabet, :health
 
-    def initialize(word)
+    def initialize(word,health = Constants::MAX_HEALTH, alphabet = nil)
       @word = word.upcase
-      @health = Constants::MAX_HEALTH
-      @alphabet = ("A".."Z").each_with_object({}) do |letter, result|
-        result[letter] = false
-      end
+      @health = health
+      if alphabet.nil? then
+        @alphabet = ("A".."Z").each_with_object({}) { |letter, result| result[letter] = false }
+      else @alphabet = alphabet end
     end
 
     def update_alphabet(letter)
@@ -64,6 +64,19 @@ module Hangman
       display_health
       display_word
       display_alphabet
+    end
+    
+    def to_json
+      JSON.dump ({
+        :health => @health,
+        :word => @word,
+        :alphabet => @alphabet.to_json
+      })
+    end
+    
+    def self.from_json(string)
+      data = JSON.load(string)
+      self.new(data["word"],data["health"],JSON.load(data["alphabet"]))
     end
   end
 end
