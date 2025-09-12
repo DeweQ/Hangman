@@ -1,4 +1,5 @@
 require "colorize"
+require "json"
 require_relative "./constants"
 
 module Hangman
