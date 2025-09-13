@@ -16,7 +16,7 @@ module Hangman
 
     str = ""
     File.open(path) { |f| str = f.readlines }
-    str
+    str[0]
   end
 
   def self.list_saves
